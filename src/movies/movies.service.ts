@@ -37,12 +37,8 @@ export class MoviesService {
   }
 
   patchMovie(movieId: string, movieData: UpdateMovieDto) {
-    this.getMovieById(movieId);
-    this.movies = this.movies.map((movie) => {
-      if (movie.id === movieId) {
-        return { ...movie, ...movieData };
-      }
-      return movie;
-    });
+    const patchedMovie = this.getMovieById(movieId);
+    this.removeMovieById(movieId);
+    this.movies.push({ ...patchedMovie, ...movieData });
   }
 }

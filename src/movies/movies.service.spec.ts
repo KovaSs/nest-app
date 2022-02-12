@@ -64,7 +64,7 @@ describe('MoviesService', () => {
       expect(result.id).toEqual(createdMovie.id);
     });
 
-    it('should be return 404 error', () => {
+    it('should be return NotFoundException error', () => {
       const movieId = 'test-id';
       try {
         service.getMovieById(movieId);
@@ -85,10 +85,29 @@ describe('MoviesService', () => {
       expect(isIncludeRemovedMovieInAllMoviesArray).toEqual(false);
     });
 
-    it('should be return 404 error', () => {
+    it('should be return NotFoundException error', () => {
       const movieId = 'test-id';
       try {
         service.removeMovieById(movieId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toEqual(`Movie by id ${movieId} not found`);
+      }
+    });
+  });
+
+  describe('testing function patchMovie', () => {
+    it('should be patched title movie', () => {
+      service.patchMovie(createdMovie.id, { title: 'Avatar' });
+      const patchedMovie = service.getMovieById(createdMovie.id);
+      expect(patchedMovie).toBeDefined();
+      expect(createdMovie.title).not.toEqual(patchedMovie.title);
+    });
+
+    it('should be return NotFoundException error', () => {
+      const movieId = 'test-id';
+      try {
+        service.patchMovie(movieId, { title: 'Avatar' });
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect(error.message).toEqual(`Movie by id ${movieId} not found`);
