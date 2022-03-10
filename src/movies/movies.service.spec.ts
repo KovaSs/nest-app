@@ -1,9 +1,12 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { MoviesService } from './movies.service';
+import { Movie } from './entities/movie.entity';
 
 describe('MoviesService', () => {
   let service: MoviesService;
+  let createdMovie: Movie;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -11,6 +14,14 @@ describe('MoviesService', () => {
     }).compile();
 
     service = module.get<MoviesService>(MoviesService);
+
+    const movie = service.createMovie({
+      title: 'Iron man',
+      year: 2010,
+      genres: ['Fantasy', 'Marvel'],
+    });
+
+    createdMovie = movie;
   });
 
   it('should be defined', () => {
@@ -24,22 +35,60 @@ describe('MoviesService', () => {
     });
   });
 
+  describe('testing function createMovie', () => {
+    it('should be created new movie', () => {
+      expect(createdMovie).toBeDefined();
+    });
+
+    it('should be includes in array with all movies', () => {
+      const allMovies = service.getAll();
+      const isIncludeRemovedMovieInAllMoviesArray = allMovies.some(
+        (movieItem) => movieItem.id === createdMovie.id,
+      );
+      expect(isIncludeRemovedMovieInAllMoviesArray).toEqual(true);
+    });
+
+    it('should be includes title', () => {
+      const allMovies = service.getAll();
+      const isIncludeRemovedMovieInAllMoviesArray = allMovies.some(
+        (movieItem) => movieItem.title === createdMovie.title,
+      );
+      expect(isIncludeRemovedMovieInAllMoviesArray).toEqual(true);
+    });
+  });
+
   describe('testing function getMovieById', () => {
     it('should be return movie', () => {
-      const movie = service.createMovie({
-        title: 'Iron man',
-        year: 2010,
-        genres: ['Fantasy', 'Marvel'],
-      });
-      const result = service.getMovieById(movie.id);
+      const result = service.getMovieById(createdMovie.id);
       expect(result).toBeDefined();
-      expect(result.id).toEqual(movie.id);
+      expect(result.id).toEqual(createdMovie.id);
     });
 
     it('should be return 404 error', () => {
       const movieId = 'test-id';
       try {
         service.getMovieById(movieId);
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toEqual(`Movie by id ${movieId} not found`);
+      }
+    });
+  });
+
+  describe('testing function removeMovie', () => {
+    it('should be remove movie', () => {
+      service.removeMovieById(createdMovie.id);
+      const allMovies = service.getAll();
+      const isIncludeRemovedMovieInAllMoviesArray = allMovies.some(
+        (movieItem) => movieItem.id === createdMovie.id,
+      );
+      expect(isIncludeRemovedMovieInAllMoviesArray).toEqual(false);
+    });
+
+    it('should be return 404 error', () => {
+      const movieId = 'test-id';
+      try {
+        service.removeMovieById(movieId);
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect(error.message).toEqual(`Movie by id ${movieId} not found`);
