@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 
 import { Movie } from './entities/movie.entity';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Injectable()
 export class MoviesService {
@@ -35,7 +36,7 @@ export class MoviesService {
     this.movies = this.movies.filter((movie) => movie.id !== movieId);
   }
 
-  patchMovie(movieId: string, movieData: Movie) {
+  patchMovie(movieId: string, movieData: UpdateMovieDto) {
     this.getMovieById(movieId);
     this.movies = this.movies.map((movie) => {
       if (movie.id === movieId) {
