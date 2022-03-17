@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 
 import { Movie } from './entities/movie.entity';
+import { CreateMovieDto } from './dto/create-movie.dto';
 
 @Injectable()
 export class MoviesService {
@@ -11,7 +12,7 @@ export class MoviesService {
     return this.movies;
   }
 
-  createMovie(movieData: Movie) {
+  createMovie(movieData: CreateMovieDto) {
     const newMovie = {
       id: uuid(),
       ...movieData,
