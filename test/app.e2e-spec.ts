@@ -35,7 +35,7 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer()).get('/movies').expect(200).expect([]);
     });
 
-    it('POST', () => {
+    it('POST 201', () => {
       return request(app.getHttpServer())
         .post('/movies')
         .send({
@@ -45,6 +45,22 @@ describe('AppController (e2e)', () => {
         })
         .expect(201);
     });
+
+    it('POST 400', () => {
+      return request(app.getHttpServer())
+        .post('/movies')
+        .send({
+          title: 'Iron man',
+          year: 2010,
+          genres: ['Fantasy', 'Marvel'],
+          notSupportedProps: true,
+        })
+        .expect(400);
+    });
+
+    it('DELETE', () => {
+      return request(app.getHttpServer()).delete('/movies').expect(404);
+    });
   });
 
   describe('/movies/:id', () => {
@@ -52,7 +68,7 @@ describe('AppController (e2e)', () => {
       return request(app.getHttpServer()).get('/movies/1').expect(404);
     });
 
-    it.todo('DELETE');
     it.todo('PATCH');
+    it.todo('DELETE');
   });
 });
